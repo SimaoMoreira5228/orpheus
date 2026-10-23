@@ -1,0 +1,36 @@
+package orpheus:plugin@0.2.0;
+
+interface host {
+	log: func(msg: string);
+	get-api-version: func() -> string;
+}
+
+interface fetch {
+	fetch: func(url: string, opts: string) -> result<string, string>;
+}
+
+interface kv {
+	kv-get: func(key: string) -> option<string>;
+	kv-set: func(key: string, value: string);
+	kv-delete: func(key: string);
+}
+
+world orpheus-plugin {
+	import host;
+	import fetch;
+	import kv;
+
+	export init: func();
+	export shutdown: func();
+	export resolve: func(query: string) -> string;
+	export filter: func(frame-ptr: u32, frame-len: u32);
+	export track-info: func() -> string;
+	export configure: func(json: string);
+	export handle-route: func(
+		method: string,
+		path: string,
+		query: string,
+		headers-json: string,
+		body-b64: string,
+	) -> result<string, string>;
+}
