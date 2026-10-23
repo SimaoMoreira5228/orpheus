@@ -1,0 +1,33 @@
+{
+	"name": "orpheus-sdk",
+	"version": "0.1.0",
+	"description": "TypeScript client library for Orpheus",
+	"license": "AGPL-3.0-or-later",
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/src/index.d.ts",
+			"default": "./dist/src/index.js"
+		}
+	},
+	"main": "./dist/src/index.js",
+	"types": "./dist/src/index.d.ts",
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"typecheck": "tsc --noEmit",
+		"build": "tsc",
+		"test": "pnpm build && node --test dist/test/client.test.js dist/test/ws.test.js"
+	},
+	"devDependencies": {
+		"@types/node": "26.6.5",
+		"oxfmt": "0.74.0",
+		"oxlint": "1.89.0",
+		"typescript": "6.0.3"
+	},
+	"packageManager": "pnpm@12.15.0",
+	"engines": {
+		"node": ">=22"
+	}
+}
