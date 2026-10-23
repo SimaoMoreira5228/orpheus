@@ -4,8 +4,6 @@ WORKDIR /build
 
 RUN apt-get update && apt-get install -y pkg-config libopus0 libopus-dev cmake g++ python3-dev python3-pip && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --break-system-packages --no-cache-dir uv
-
 COPY . .
 
 RUN cargo build --release --bin orpheus

@@ -63,16 +63,6 @@ const YOUTUBE_PLAYLIST_REGEX: YoutubePlaylistPattern = YoutubePlaylistPattern;
 const FFMPEG_USER_AGENT: &str =
 	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 
-fn player_client_name(client: PlayerClient) -> &'static str {
-	match client {
-		PlayerClient::Default => "default",
-		PlayerClient::Android => "android",
-		PlayerClient::TvEmbedded => "web_embedded",
-		PlayerClient::Ios => "ios",
-		PlayerClient::Web => "web",
-	}
-}
-
 pub struct YtDlpSourceManager {
 	client: Arc<Client>,
 }
@@ -98,7 +88,7 @@ impl YtDlpSourceManager {
 				Err(e) => {
 					warn!(
 						"YouTube resolve with {} client failed: {}, trying next client",
-						player_client_name(client),
+						client.as_str(),
 						e
 					);
 					continue;
@@ -111,7 +101,7 @@ impl YtDlpSourceManager {
 					Err(e) => {
 						warn!(
 							"YouTube resolve with {} client failed on search entry: {}, trying next client",
-							player_client_name(client),
+							client.as_str(),
 							e
 						);
 						continue;
@@ -123,7 +113,7 @@ impl YtDlpSourceManager {
 			let Some(stream_url) = info.best_audio_url().map(|url| url.to_string()) else {
 				warn!(
 					"YouTube resolve with {} client found no audio stream, trying next client",
-					player_client_name(client),
+					client.as_str(),
 				);
 				continue;
 			};
@@ -134,7 +124,7 @@ impl YtDlpSourceManager {
 
 			warn!(
 				"YouTube stream URL from {} client not fetchable, trying next client",
-				player_client_name(client),
+				client.as_str(),
 			);
 		}
 

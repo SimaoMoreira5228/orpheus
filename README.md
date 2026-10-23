@@ -14,14 +14,14 @@ Spotify URL and search support needs Spotify Web API credentials. Add `SPOTIFY_C
 
 ## Run it
 
-Building from source needs Rust, CMake, a C++23 compiler, Python development headers, `uv`, and Opus development libraries. On Debian or Ubuntu, install the system packages with:
+Building from source needs Rust, CMake, a C++23 compiler, Python development headers, and Opus development libraries. On Debian or Ubuntu, install the system packages with:
 
 ```sh
 sudo apt-get update
 sudo apt-get install -y cmake g++ libopus-dev pkg-config python3-dev
 ```
 
-Install `uv` using the instructions at [docs.astral.sh/uv](https://docs.astral.sh/uv/getting-started/installation/), then build and start the server:
+Then build and start the server:
 
 ```sh
 cargo build --release --bin orpheus
@@ -29,6 +29,8 @@ ORPHEUS_PASSWORD='choose-a-password' cargo run --release --bin orpheus
 ```
 
 Orpheus reads `config.toml` from the current directory. The checked-in file listens on `0.0.0.0:2333` and contains the default resolver order and plugin settings. Change `host` and `http_port` there if you need a different address. The server reads `ORPHEUS_PASSWORD` from the environment or `.env`; set your own value before exposing the API.
+
+The executable links to CPython. When you run a release binary outside the Docker image, install the Python runtime library matching the Python version used to build it. The Docker image includes `libpython3.11`.
 
 The health endpoint is public at `http://localhost:2333/health`. Most API routes require the password in the `Authorization` header. The WebSocket endpoint is `/v4/websocket` and performs its own authentication.
 

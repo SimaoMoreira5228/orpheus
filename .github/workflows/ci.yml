@@ -72,11 +72,6 @@ jobs:
       - name: Install native build dependencies
         run: sudo apt-get update && sudo apt-get install -y cmake g++ libopus-dev pkg-config python3-dev
 
-      - name: Setup uv
-        uses: astral-sh/setup-uv@v10.3.2
-        with:
-          version: latest
-
       - name: Run linters
         run: ./tools/lint
 
@@ -162,11 +157,6 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Setup uv
-        uses: astral-sh/setup-uv@v10.3.2
-        with:
-          version: latest
-
       - name: Cache cargo registry
         uses: Swatinem/rust-cache@v2
 
@@ -217,11 +207,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-
-      - name: Setup uv
-        uses: astral-sh/setup-uv@v10.3.2
-        with:
-          version: latest
 
       - name: Cache cargo registry
         uses: Swatinem/rust-cache@v2

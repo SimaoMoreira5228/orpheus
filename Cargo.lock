@@ -2411,9 +2411,9 @@ dependencies = [
 
 [[package]]
 name = "libytdlp"
-version = "0.6.0"
+version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3db3d5a06c0a6d9472e2bdc8f9c8273fdf49cb28e88661b5521717e157efef1b"
+checksum = "1a4b386ffb21a37ec5e3b8634afc9e3fa3939feab1193aa5f092eb0f222a9d05"
 dependencies = [
  "libytdlp-sys",
  "serde",
@@ -2423,9 +2423,9 @@ dependencies = [
 
 [[package]]
 name = "libytdlp-sys"
-version = "0.6.0"
+version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "838cfae908ed558ad602ef945f82bc16f71afcfbe426a8ac74cf6ee0e62bbad2"
+checksum = "086c1e6c8cbc222c085e83f32d58b2d48e351515aa9c5805d1a7ec7bbc77dd9f"
 dependencies = [
  "cmake",
 ]

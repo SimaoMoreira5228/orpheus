@@ -45,11 +45,6 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Setup uv
-        uses: astral-sh/setup-uv@v10.3.2
-        with:
-          version: latest
-
       - name: Install native build dependencies
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y cmake g++ libopus-dev pkg-config python3-dev

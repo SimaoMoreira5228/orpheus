@@ -22,7 +22,7 @@ actix-web-actors = "4"
 dashmap = "6"
 futures-util = "0.3"
 http = "1"
-libytdlp = "0.6.0"
+libytdlp = "0.6.1"
 parking_lot = "0.13"
 rand = "0.10"
 serde = { version = "1", features = ["derive"] }
