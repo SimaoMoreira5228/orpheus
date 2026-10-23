@@ -1,0 +1,32 @@
+[package]
+name = "orpheus-control-api"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "REST/WS endpoints, player management, and metrics"
+
+[dependencies]
+actix.workspace = true
+actix-rt.workspace = true
+actix-web.workspace = true
+actix-web-actors.workspace = true
+anyhow.workspace = true
+audiopus = "0.2"
+base64 = "0.23"
+dashmap.workspace = true
+davey = "0.1"
+discordrs = { version = "3", default-features = false, features = ["voice", "dave"] }
+orpheus-core = { path = "../core" }
+orpheus-plugins = { path = "../plugins" }
+orpheus-track-resolver = { path = "../track-resolver" }
+parking_lot.workspace = true
+prometheus-client = "0.25"
+rand.workspace = true
+reqwest = { version = "0.13", features = ["stream"] }
+serde.workspace = true
+serde_json.workspace = true
+sysinfo = "0.39"
+tokio.workspace = true
+tokio-util = { version = "0.7", features = ["io"] }
+toml = "1.1"
+tracing.workspace = true

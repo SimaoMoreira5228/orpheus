@@ -1,0 +1,22 @@
+[package]
+name = "orpheus-track-resolver"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Track sources: libytdlp, SoundCloud, Bandcamp, local files, HTTP, playlists"
+
+[dependencies]
+anyhow.workspace = true
+base64 = "0.23"
+futures-util.workspace = true
+libytdlp.workspace = true
+orpheus-core = { path = "../core" }
+orpheus-plugins = { path = "../plugins" }
+parking_lot.workspace = true
+reqwest = { version = "0.13", features = ["json"] }
+serde.workspace = true
+serde_json.workspace = true
+symphonia.workspace = true
+thiserror = "2"
+tokio.workspace = true
+tracing = "0.1"

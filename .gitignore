@@ -1,0 +1,7 @@
+/target
+local/
+.opencode/
+node_modules/
+dist/
+.env
+

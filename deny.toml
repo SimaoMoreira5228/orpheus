@@ -1,0 +1,65 @@
+# cargo-deny configuration for Orpheus.
+# Advisories are deny (RUSTSEC). Licenses are allow-listed (AGPL-3.0-or-later
+# workspace: copyleft deps are fine, unknown ones fail). Duplicates warn.
+
+[graph]
+targets = ["x86_64-unknown-linux-gnu"]
+
+[advisories]
+ignore = [
+	# Dev-only: serenity 0.12 (example bot) pulls rustls 0.22 / webpki 0.102, both EOL.
+	# The shipped tree uses fixed rustls 0.23.46 / webpki 0.103.16.
+	{ id = "RUSTSEC-2026-0346", reason = "dev-only rustls 0.22 via serenity 0.12; shipped tree fixed" },
+	{ id = "RUSTSEC-2026-0349", reason = "dev-only rustls 0.22 via serenity 0.12; shipped tree fixed" },
+	{ id = "RUSTSEC-2026-0049", reason = "dev-only webpki 0.102 via serenity 0.12; shipped tree fixed" },
+	{ id = "RUSTSEC-2026-0098", reason = "dev-only webpki 0.102 via serenity 0.12; shipped tree fixed" },
+	{ id = "RUSTSEC-2026-0099", reason = "dev-only webpki 0.102 via serenity 0.12; shipped tree fixed" },
+	{ id = "RUSTSEC-2026-0104", reason = "dev-only webpki 0.102 via serenity 0.12; shipped tree fixed" },
+	{ id = "RUSTSEC-2026-0382", reason = "dev-only webpki 0.102 via serenity 0.12; shipped tree fixed" },
+	# Shipped but pinned upstream with no fixed release in range.
+	{ id = "RUSTSEC-2026-0258", reason = "h2 0.3 has no fixed release; pinned by latest actix-http" },
+	{ id = "RUSTSEC-2026-0207", reason = "libcrux-sha3 pinned by latest hpke-rs/openmls/davey chain" },
+	{ id = "RUSTSEC-2026-0208", reason = "libcrux-sha3 pinned by latest hpke-rs/openmls/davey chain" },
+	{ id = "RUSTSEC-2026-0212", reason = "libcrux-secrets pinned by latest hpke-rs/openmls/davey chain" },
+	{ id = "RUSTSEC-2024-0384", reason = "unmaintained instant via latest davey chain; clears upstream" },
+	{ id = "RUSTSEC-2026-0150", reason = "audiopus_sys unmaintained, no safe upgrade available" },
+]
+
+[licenses]
+allow = [
+	"AGPL-3.0-or-later",
+	"Apache-2.0",
+	"Apache-2.0 WITH LLVM-exception",
+	"BSD-2-Clause",
+	"BSD-3-Clause",
+	"BSL-1.0",
+	"CC0-1.0",
+	"CDLA-Permissive-2.0",
+	"ISC",
+	"MIT",
+	"MIT-0",
+	"MPL-2.0",
+	"Unicode-3.0",
+	"Zlib",
+]
+confidence-threshold = 0.8
+exceptions = []
+
+[licenses.private]
+ignore = false
+
+[bans]
+multiple-versions = "warn"
+wildcards = "warn"
+highlight = "all"
+workspace-default-features = "allow"
+external-default-features = "allow"
+allow = []
+deny = []
+skip = []
+
+[sources]
+unknown-registry = "warn"
+unknown-git = "warn"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = []
