@@ -1,0 +1,14 @@
+FROM rust:bookworm
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y pkg-config libopus0 libopus-dev ca-certificates curl cmake g++ python3-dev python3-pip ffmpeg python3 && rm -rf /var/lib/apt/lists/* \
+	&& pip install --break-system-packages --no-cache-dir uv yt-dlp==2026.10.21
+
+RUN cargo install cargo-watch || true
+
+COPY . .
+
+EXPOSE 2333 2334
+
+CMD ["cargo", "watch", "-x", "run", "--", "--config", "config.toml"]

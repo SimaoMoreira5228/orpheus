@@ -1,0 +1,30 @@
+host = "0.0.0.0"
+http_port = 2333
+restart_state_path = "./data/restart-state.json"
+
+[runtime]
+source_order = [
+	"twitch",
+	"spotify",
+	"youtube",
+	"soundcloud",
+	"bandcamp",
+	"playlist",
+	"local",
+	"ytdlp",
+	"http",
+]
+default_source_timeout_ms = 30000
+source_timeouts_ms = {}
+diagnostics_capacity = 64
+log_level = "info"
+
+[runtime.prefetch]
+enabled = true
+lookahead_ms = 15000
+max_url_age_ms = 30000
+max_concurrent = 4
+
+[plugins]
+enabled = true
+dir = "./plugins"

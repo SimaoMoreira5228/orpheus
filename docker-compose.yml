@@ -1,0 +1,26 @@
+services:
+  orpheus-dev:
+    image: orpheus-dev:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: orpheus-dev
+    ports:
+      - "2333:2333"
+      - "2334:2334"
+    volumes:
+      - .:/app
+      - orpheus-config:/app/config
+    environment:
+      - RUST_LOG=debug
+      - ORPHEUS_HOST=0.0.0.0
+      - ORPHEUS_HTTP_PORT=2333
+      - ORPHEUS_WS_PORT=2334
+      - RUST_BACKTRACE=1
+    network_mode: host
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+
+volumes:
+  orpheus-config:

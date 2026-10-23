@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$root"
+
+cargo clippy --workspace --all-targets --all-features -- -D warnings
+pnpm --dir "$root/sdks/typescript" exec oxlint --deny-warnings \
+	"$root/sdks/typescript/src" \
+	"$root/sdks/typescript/test" \
+	"$root/examples/discord-bot-js/index.js"

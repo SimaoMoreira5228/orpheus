@@ -1,0 +1,239 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+jobs:
+  fmt:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install nightly Rust tools
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.15.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: sdks/typescript/pnpm-lock.yaml
+
+      - name: Install JS tooling
+        working-directory: sdks/typescript
+        run: pnpm install --frozen-lockfile
+
+      - name: Check formatting
+        run: ./tools/fmt --check
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust and Clippy
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.15.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: sdks/typescript/pnpm-lock.yaml
+
+      - name: Install JS tooling
+        working-directory: sdks/typescript
+        run: pnpm install --frozen-lockfile
+
+      - name: Install native build dependencies
+        run: sudo apt-get update && sudo apt-get install -y cmake g++ libopus-dev pkg-config python3-dev
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v10.3.2
+        with:
+          version: latest
+
+      - name: Run linters
+        run: ./tools/lint
+
+  audit:
+    name: Dependency Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cargo-deny
+        run: cargo install cargo-deny --locked
+
+      - name: Run audit
+        run: cargo deny check
+
+  sdk-ts:
+    name: TypeScript SDK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.15.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: |
+            sdks/typescript/pnpm-lock.yaml
+            examples/discord-bot-js/pnpm-lock.yaml
+
+      - name: Install dependencies
+        working-directory: sdks/typescript
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Discord bot dependencies
+        working-directory: examples/discord-bot-js
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck and test
+        working-directory: sdks/typescript
+        run: |
+          pnpm typecheck
+          pnpm test
+
+  test:
+    name: Test (${{ matrix.target }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+          - os: macos-15-intel
+            target: x86_64-apple-darwin
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Setup Python on Windows
+        if: runner.os == 'Windows'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v10.3.2
+        with:
+          version: latest
+
+      - name: Cache cargo registry
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install native build dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y cmake g++ libopus-dev pkg-config python3-dev
+
+      - name: Install native build dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: brew install cmake opus pkg-config
+
+      - name: Run tests
+        if: matrix.target != 'x86_64-pc-windows-msvc'
+        run: cargo test --workspace --all-features --target ${{ matrix.target }}
+
+      - name: Run Windows tests
+        if: matrix.target == 'x86_64-pc-windows-msvc'
+        run: cargo test --workspace --all-features --release --target ${{ matrix.target }}
+
+  build:
+    name: Build (${{ matrix.target }})
+    runs-on: ${{ matrix.os }}
+    needs: [fmt, lint, audit, sdk-ts, test]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+          - os: macos-15-intel
+            target: x86_64-apple-darwin
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Setup Python on Windows
+        if: runner.os == 'Windows'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v10.3.2
+        with:
+          version: latest
+
+      - name: Cache cargo registry
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install native build dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y cmake g++ libopus-dev pkg-config python3-dev
+
+      - name: Install native build dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: brew install cmake opus pkg-config
+
+      - name: Build
+        run: cargo build --workspace --release --all-features --target ${{ matrix.target }}
+

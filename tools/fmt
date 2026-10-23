@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+mode="${1:-}"
+
+if [[ $# -gt 1 || ( -n "$mode" && "$mode" != "--check" ) ]]; then
+	printf 'Usage: %s [--check]\n' "$0" >&2
+	exit 2
+fi
+
+cd "$root"
+
+rust_args=(fmt --all)
+oxfmt_args=(--config "$root/.oxfmtrc.json")
+if [[ "$mode" == "--check" ]]; then
+	rust_args+=(-- --check)
+	oxfmt_args+=(--check)
+fi
+
+cargo +nightly "${rust_args[@]}"
+pnpm --dir "$root/sdks/typescript" exec oxfmt "${oxfmt_args[@]}" \
+	"$root/sdks/typescript/src" \
+	"$root/sdks/typescript/test" \
+	"$root/examples/discord-bot-js/index.js"

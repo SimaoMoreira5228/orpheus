@@ -1,0 +1,8 @@
+[target.aarch64-unknown-linux-gnu]
+dockerfile = "cross/aarch64.Dockerfile"
+
+[target.aarch64-unknown-linux-gnu.env]
+passthrough = [
+	"LIBYTDLP_PYTHON=/usr/local/bin/libytdlp-python-aarch64",
+	"LIBOPUS_LIB_DIR=/usr/lib/aarch64-linux-gnu",
+]

@@ -1,0 +1,15 @@
+target/
+.git/
+.gitignore
+Cargo.lock
+.env
+.env.*
+*.key
+*.pem
+*.log
+.DS_Store
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
