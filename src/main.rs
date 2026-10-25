@@ -204,31 +204,48 @@ async fn main() -> anyhow::Result<()> {
 			.configure(orpheus_control_api::health::configure)
 			.configure(orpheus_control_api::websocket::configure)
 	})
+	.shutdown_timeout(5)
 	.disable_signals()
 	.bind(addr)?
 	.run();
 	let server_handle = server.handle();
-	tokio::pin!(server);
+	let mut server_task = tokio::spawn(server);
 
 	let (server_result, snapshot_result) = tokio::select! {
-		result = &mut server => {
+		result = &mut server_task => {
+			let server_result = result
+				.map_err(anyhow::Error::from)
+				.and_then(|result| result.map_err(anyhow::Error::from));
 			let snapshot = restart_store
 				.save(&state.player_manager, &state.voice_connection_manager)
 				.await;
-			(result, snapshot)
+			(server_result, snapshot)
 		},
 		_ = shutdown_signal() => {
 			info!("Graceful shutdown requested");
+			info!("Pausing HTTP listener");
 			server_handle.pause().await;
+			info!("Saving restart snapshot");
 			let snapshot = restart_store
 				.save(&state.player_manager, &state.voice_connection_manager)
 				.await;
+			if let Err(error) = &snapshot {
+				tracing::error!("Failed to save restart snapshot: {error}");
+			}
+			info!("Stopping HTTP server");
 			server_handle.stop(true).await;
-			((&mut server).await, snapshot)
+			let server_result = server_task
+				.await
+				.map_err(anyhow::Error::from)
+				.and_then(|result| result.map_err(anyhow::Error::from));
+			info!("HTTP server stopped");
+			(server_result, snapshot)
 		}
 	};
 
+	info!("Shutting down voice connections");
 	state.voice_connection_manager.shutdown_all().await;
+	info!("Voice connections shut down");
 
 	server_result?;
 	let saved = snapshot_result?;
